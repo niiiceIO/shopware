@@ -155,8 +155,11 @@
 
                 me._on($el, 'mouseenter', $.proxy(me.onListItemEnter, me, i, $el));
                 me._on($el, 'click', $.proxy(me.onClick, me, i, $el));
+                me._on($el, 'mouseleave', $.proxy(me.onMouseLeave, me));
             });
 
+            me._on(me.$el[0], 'mouseleave', $.proxy(me.onMouseLeave, me));
+            me._on(me.$el.find(me.opts.menuContainerSelector), 'mouseleave', $.proxy(me.onMouseLeave, me));
             me._on(me._$closeButton, 'click', $.proxy(me.onCloseButtonClick, me));
         },
 
@@ -246,21 +249,22 @@
          * @event onMouseLeave
          * @param {jQuery.Event} event
          */
-        onMouseMove: function (event) {
+        onMouseLeave: function (event) {
             var me = this,
                 target = event.target,
+                newTarget = event.toElement || event.relatedTarget,
                 pluginEl = me.$el[0];
 
-            if (pluginEl === target || $.contains(me.$el[0], target) || me._$listItems.has(target).length) {
+            if (pluginEl === newTarget || $.contains(me.$el[0], newTarget) || me._$listItems.has(newTarget).length) {
                 return;
+            } else {
+                if (me.hoverDelayTimeoutId) {
+                    window.clearTimeout(me.hoverDelayTimeoutId);
+                    delete me.hoverDelayTimeoutId;
+                }
+    
+                me.closeMenu();
             }
-
-            if (me.hoverDelayTimeoutId) {
-                window.clearTimeout(me.hoverDelayTimeoutId);
-                delete me.hoverDelayTimeoutId;
-            }
-
-            me.closeMenu();
         },
 
         /**
@@ -312,8 +316,6 @@
         openMenu: function () {
             var me = this;
 
-            $body.on('mousemove touchstart', $.proxy(me.onMouseMove, me));
-
             me.$el.show();
 
             $.publish('plugin/swAdvancedMenu/onOpenMenu', [ me ]);
@@ -332,8 +334,6 @@
             me._$list.find('.' + opts.itemHoverClass).removeClass(opts.itemHoverClass);
 
             me.$el.hide();
-
-            $body.off('mousemove touchstart', $.proxy(me.onMouseMove, me));
 
             me._targetIndex = -1;
 
