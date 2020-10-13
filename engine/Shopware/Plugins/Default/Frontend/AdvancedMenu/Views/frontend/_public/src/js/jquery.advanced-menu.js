@@ -127,6 +127,8 @@
 
             // Register all needed events
             me.registerEvents();
+
+            me.closeMenu();
         },
 
         /**
