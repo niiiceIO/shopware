@@ -161,7 +161,6 @@
             });
 
             me._on(me.$el[0], 'mouseleave', $.proxy(me.onMouseLeave, me));
-            me._on(me.$el.find(me.opts.menuContainerSelector), 'mouseleave', $.proxy(me.onMouseLeave, me));
             me._on(me._$closeButton, 'click', $.proxy(me.onCloseButtonClick, me));
         },
 
